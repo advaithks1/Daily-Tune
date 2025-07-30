@@ -175,7 +175,6 @@
       #result { font-size: 1em; padding: .8em .3em;}
       button { font-size: 1em; padding: .8em 1.7em;}
     }
-    /* Google Fonts: Poppins */
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
   </style>
 </head>
@@ -185,9 +184,9 @@
       <span class="wonder">🎵</span>
       Tamil Song Suggester
     </h1>
-<div class="notice">
-  Your shortcut to the perfect song – daily and effortless.
-</div>
+    <div class="notice">
+      Your shortcut to the perfect song – daily and effortless.
+    </div>
 
     <label for="genre"><span class="genre-icon"></span>Choose your genre(Sir):</label>
     <select id="genre" disabled>
@@ -195,11 +194,15 @@
     </select>
     <button id="suggestBtn" onclick="suggestSong()" disabled>🎶 Suggest Me a Song</button>
     <div id="result"></div>
+
+    <!-- ✅ Copy to Clipboard button -->
+    <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+
     <div class="footer">
       Made with <span style="color:#e91e63;">&#10084;</span> for Tamil music lovers
     </div>
   </div>
-  <!-- SheetJS library from CDN -->
+
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script>
     let allSongs = [];
@@ -213,10 +216,8 @@
         })
         .then(data => {
           const workbook = XLSX.read(data, {type: 'array'});
-          // Use first sheet
           const sheetName = workbook.SheetNames[0];
           const sheet = workbook.Sheets[sheetName];
-          // Convert to JSON, header from first row
           const json = XLSX.utils.sheet_to_json(sheet, {defval: ""});
           allSongs = json.filter(row =>
             row['Song Name'] && row['Author'] && row['Genre']
@@ -261,12 +262,29 @@
         return;
       }
       const song = filtered[Math.floor(Math.random() * filtered.length)];
-      // Remove trailing number from song name (and any trailing spaces)
       let cleanSongName = song['Song Name'].replace(/\s*\d+$/, "");
       document.getElementById('result').innerHTML =
         `<div class="suggested-song">${cleanSongName}</div>
          <div class="author-label">by ${song['Author']}</div>`;
     }
+
+function copyToClipboard() {
+  const resultText = document.querySelector(".suggested-song");
+  if (!resultText) {
+    alert("Please get a song suggestion first!");
+    return;
+  }
+  const songName = resultText.innerText.trim();
+  navigator.clipboard.writeText(songName)
+    .then(() => {
+      alert("Copied!");
+    })
+    .catch(err => {
+      alert("Copy failed. Try again.");
+      console.error(err);
+    });
+}
+
 
     window.onload = fetchAndParseExcel;
   </script>
